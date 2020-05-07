@@ -9,11 +9,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".LiveDataActivity"
-            android:label="LiveData"></activity>
+        <activity
+            android:name=".LiveDataReactiveStreamsActivity"
+            android:label="LiveDataReactiveStreams" />
+        <activity
+            android:name=".ObservableLiveDataActivity"
+            android:label="Observable + LiveData" />
+        <activity
+            android:name=".LiveDataActivity"
+            android:label="LiveData" />
         <activity
             android:name=".SubjectActivity"
-            android:label="Subject"></activity>
+            android:label="Subject" />
         <activity
             android:name=".ObservableActivity"
             android:label="Observable">

@@ -21,7 +21,7 @@ public class LiveDataActivity extends AppCompatActivity {
     private final static String TAG = LiveDataActivity.class.getSimpleName();
 
     int currentValue = 1;
-    private MutableLiveData<Integer> data = new MutableLiveData<>(currentValue);
+    private MutableLiveData<Integer> data;
 
     TextView tvData;
 
@@ -32,6 +32,8 @@ public class LiveDataActivity extends AppCompatActivity {
 
         tvData = findViewById(R.id.tv_data);
 
+        data = new MutableLiveData<>(currentValue);
+
         populateUI();
     }
 
@@ -40,6 +42,7 @@ public class LiveDataActivity extends AppCompatActivity {
 
         data.observe(this, value -> {
             if(null != value) {
+                Log.i(TAG, "New LiveData value received: " + value);
                 tvData.setText(String.valueOf(value));
             }
         });
@@ -51,7 +54,22 @@ public class LiveDataActivity extends AppCompatActivity {
         currentValue = currentValue + 1;
         data.postValue(currentValue);
 
+        // Advantages:
         // No need to call the method populateUI again because the "data.observe" checks for updates on the LiveData
+        // LiveData is lifecycle aware so only notifies an activity that is active
+        // Also, no need to unsubscribe it because it already knows the state of the activity
+        // LiveData listens to changes already on a background thread so no need to change it
+
+        // Downsides:
+        // LiveData alone does not survive configuration changes so it will be reset if the phone is rotated
+        // Not easy to handle errors or transform data before passing to UI
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Log.i(TAG, "onResume");
     }
 
     @Override
@@ -81,6 +99,20 @@ public class LiveDataActivity extends AppCompatActivity {
 
         if (id == R.id.action_livedata) {
             Intent observableIntent = new Intent(this, LiveDataActivity.class);
+            startActivity(observableIntent);
+
+            return true;
+        }
+
+        if (id == R.id.action_observable_livedata) {
+            Intent observableIntent = new Intent(this, ObservableLiveDataActivity.class);
+            startActivity(observableIntent);
+
+            return true;
+        }
+
+        if (id == R.id.action_live_data_reactive_streams) {
+            Intent observableIntent = new Intent(this, LiveDataReactiveStreamsActivity.class);
             startActivity(observableIntent);
 
             return true;

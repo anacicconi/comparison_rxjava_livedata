@@ -23,8 +23,8 @@ public class SubjectActivity extends AppCompatActivity {
     int currentValue = 1;
 
     CompositeDisposable disposable;
-    Observable<Integer> observable = Observable.just(currentValue);
-    ReplaySubject<Integer> subject = ReplaySubject.create();
+    Observable<Integer> observable;
+    ReplaySubject<Integer> subject;
 
     TextView tvData;
 
@@ -33,21 +33,19 @@ public class SubjectActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subject);
 
-        disposable = new CompositeDisposable();
-
         tvData = findViewById(R.id.tv_data);
 
-        observable.subscribe(subject);
-        //subject.onNext(observable);
+        disposable = new CompositeDisposable();
+        observable = Observable.just(currentValue);
+        subject = ReplaySubject.create();
 
-        //subject.onNext(currentValue);
+        observable.subscribe(subject);
 
         populateUI();
     }
 
     private void populateUI() {
         Log.i(TAG, "Populating Subject UI - started");
-
 
         Disposable disposableSubject = subject
             .subscribe(
@@ -64,6 +62,7 @@ public class SubjectActivity extends AppCompatActivity {
 
     public void addData(View v) {
         currentValue = currentValue + 1;
+        // TODO: I can make the subject subscribes to the values of the observable but how to send more values later?
         //observable = Observable.just(currentValue);
         //subject.onNext(currentValue);
     }
@@ -102,6 +101,20 @@ public class SubjectActivity extends AppCompatActivity {
 
         if (id == R.id.action_livedata) {
             Intent observableIntent = new Intent(this, LiveDataActivity.class);
+            startActivity(observableIntent);
+
+            return true;
+        }
+
+        if (id == R.id.action_observable_livedata) {
+            Intent observableIntent = new Intent(this, ObservableLiveDataActivity.class);
+            startActivity(observableIntent);
+
+            return true;
+        }
+
+        if (id == R.id.action_live_data_reactive_streams) {
+            Intent observableIntent = new Intent(this, LiveDataReactiveStreamsActivity.class);
             startActivity(observableIntent);
 
             return true;

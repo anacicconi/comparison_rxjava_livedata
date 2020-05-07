@@ -14,4 +14,6 @@
     <string name="observable">Observable</string>
     <string name="subject">Subject</string>
     <string name="live_data">Live Data</string>
+    <string name="observable_live_data">Observable + LiveData</string>
+    <string name="live_data_reactive_streams">LiveDataReactiveStreams</string>
 </resources>

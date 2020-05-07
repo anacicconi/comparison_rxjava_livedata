@@ -14,4 +14,12 @@
         android:id="@+id/action_livedata"
         android:orderInCategory="3"
         android:title="@string/live_data" />
+    <item
+        android:id="@+id/action_observable_livedata"
+        android:orderInCategory="4"
+        android:title="@string/observable_live_data" />
+    <item
+        android:id="@+id/action_live_data_reactive_streams"
+        android:orderInCategory="5"
+        android:title="@string/live_data_reactive_streams" />
 </menu>

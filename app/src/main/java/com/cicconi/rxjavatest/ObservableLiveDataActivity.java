@@ -6,45 +6,63 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
-public class ObservableActivity extends AppCompatActivity {
+public class ObservableLiveDataActivity extends AppCompatActivity {
 
-    private final static String TAG = ObservableActivity.class.getSimpleName();
+    private final static String TAG = ObservableLiveDataActivity.class.getSimpleName();
 
     int currentValue = 1;
-
     CompositeDisposable disposable;
     Observable<Integer> observable;
+    private MutableLiveData<Integer> data;
 
     TextView tvData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_observable);
+        setContentView(R.layout.activity_live_data);
 
         tvData = findViewById(R.id.tv_data);
 
         disposable = new CompositeDisposable();
         observable = Observable.just(currentValue);
 
+        // The LiveData starts empty because it will receive the values from the observable
+        data = new MutableLiveData<>();
+
         populateUI();
+        updateDataValue();
     }
 
     private void populateUI() {
-        Log.i(TAG, "Populating Observable UI - started");
+        data.observe(this, value -> {
+            if(null != value) {
+                Log.i(TAG, "New LiveData value received: " + value);
+                tvData.setText(String.valueOf(value));
+            }
+        });
+    }
+
+    private void updateDataValue() {
+        Log.i(TAG, "Populating LiveData UI - started");
 
         Disposable disposableObservable = observable
             .subscribe(
-                result -> tvData.setText(String.valueOf(result)),
+                result -> data.postValue(result),
                 Throwable::printStackTrace,
-                () -> Log.i(TAG, "Populating Observable UI - finished")
+                () -> Log.i(TAG, "Populating LiveData UI - finished")
             );
 
         disposable.add(disposableObservable);
@@ -54,32 +72,8 @@ public class ObservableActivity extends AppCompatActivity {
         currentValue = currentValue + 1;
         observable = Observable.just(currentValue);
 
-        populateUI();
-
-        // Advantages:
-        // Easy to handle error cases or transforming the data before sending it to the view
-
-        // Downsides:
-        // if I want the view to be updated when the observable is updated I have to do it by myself
-        // calling the method again because the "observable.subscribe" does not keep listening for changes
-        // In other words, I have to subscribe again each time the observable changes
-
-        // By default, observables subscribe on main thread so if this was a heavy task I would need to change it manually
-        // Observables do not survive configuration changes so it will be reset if the phone is rotated
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        Log.i(TAG, "onResume");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        disposable.dispose();
+        //TODO: is it possible to make LiveData listens to changes on observable without calling the subscribe again?
+        updateDataValue();
     }
 
     @Override
