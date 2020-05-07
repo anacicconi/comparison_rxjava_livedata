@@ -6,7 +6,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,23 +17,22 @@ public class ObservableActivity extends AppCompatActivity {
 
     private final static String TAG = ObservableActivity.class.getSimpleName();
 
+    int currentValue = 1;
+
     CompositeDisposable disposable;
-    Observable<Integer> justObservable;
+    Observable<Integer> observable;
 
     TextView tvData;
-    Button btnAddData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_observable);
 
-        disposable = new CompositeDisposable();
-
         tvData = findViewById(R.id.tv_data);
-        btnAddData = findViewById(R.id.btn_add_data);
 
-        justObservable = Observable.just(1, 2, 3);
+        disposable = new CompositeDisposable();
+        observable = Observable.just(currentValue);
 
         populateUI();
     }
@@ -42,25 +40,24 @@ public class ObservableActivity extends AppCompatActivity {
     private void populateUI() {
         Log.i(TAG, "Populating Observable UI - started");
 
-        Disposable observable = justObservable
+        Disposable disposableObservable = observable
             .subscribe(
-                // result -> tvData.setText(result), // the one that will be set to the TextView is "three" because it's the last received
-                result -> {
-                    CharSequence currentText = tvData.getText();
-                    String textToUpdate = String.valueOf(result);
-                    tvData.setText(String.format("%s %s", currentText, textToUpdate)); // have to concatenate each time to get them all
-                } ,
+                result -> tvData.setText(String.valueOf(result)),
                 Throwable::printStackTrace,
                 () -> Log.i(TAG, "Populating Observable UI - finished")
             );
 
-        disposable.add(observable);
+        disposable.add(disposableObservable);
     }
 
     public void addData(View v) {
-        justObservable = Observable.just(4, 5, 6);
-        // populateUI(): if I want the view to be updated when the observable is updated I have to do it by myself
-        // calling the method again because the subscribe does not keep listening for changes
+        currentValue = currentValue + 1;
+        observable = Observable.just(currentValue);
+
+        // if I want the view to be updated when the observable is updated I have to do it by myself
+        // calling the method again because the "observable.subscribe" does not keep listening for changes
+        // In other words, I have to subscribe again each time the observable changes
+        // populateUI();
     }
 
     @Override
@@ -73,7 +70,7 @@ public class ObservableActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.observable_menu, menu);
+        inflater.inflate(R.menu.main_menu, menu);
         return true;
     }
 
@@ -81,9 +78,23 @@ public class ObservableActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        if (id == R.id.action_observable) {
+            Intent observableIntent = new Intent(this, ObservableActivity.class);
+            startActivity(observableIntent);
+
+            return true;
+        }
+
         if (id == R.id.action_subject) {
             Intent subjectIntent = new Intent(this, SubjectActivity.class);
             startActivity(subjectIntent);
+
+            return true;
+        }
+
+        if (id == R.id.action_livedata) {
+            Intent observableIntent = new Intent(this, LiveDataActivity.class);
+            startActivity(observableIntent);
 
             return true;
         }

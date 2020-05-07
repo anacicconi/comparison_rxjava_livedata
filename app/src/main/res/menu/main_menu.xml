@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ObservableActivity">
+    <item
+        android:id="@+id/action_observable"
+        android:orderInCategory="1"
+        android:title="@string/observable" />
+    <item
+        android:id="@+id/action_subject"
+        android:orderInCategory="2"
+        android:title="@string/subject" />
+    <item
+        android:id="@+id/action_livedata"
+        android:orderInCategory="3"
+        android:title="@string/live_data" />
+</menu>

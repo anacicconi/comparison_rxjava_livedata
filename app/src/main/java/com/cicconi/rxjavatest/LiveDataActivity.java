@@ -8,71 +8,50 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import io.reactivex.Observable;
-import io.reactivex.disposables.CompositeDisposable;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.subjects.BehaviorSubject;
-import io.reactivex.subjects.ReplaySubject;
 
-public class SubjectActivity extends AppCompatActivity {
+public class LiveDataActivity extends AppCompatActivity {
 
-    private final static String TAG = SubjectActivity.class.getSimpleName();
+    private final static String TAG = LiveDataActivity.class.getSimpleName();
 
     int currentValue = 1;
-
-    CompositeDisposable disposable;
-    Observable<Integer> observable = Observable.just(currentValue);
-    ReplaySubject<Integer> subject = ReplaySubject.create();
+    private MutableLiveData<Integer> data = new MutableLiveData<>(currentValue);
 
     TextView tvData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_subject);
-
-        disposable = new CompositeDisposable();
+        setContentView(R.layout.activity_live_data);
 
         tvData = findViewById(R.id.tv_data);
-
-        observable.subscribe(subject);
-        //subject.onNext(observable);
-
-        //subject.onNext(currentValue);
 
         populateUI();
     }
 
     private void populateUI() {
-        Log.i(TAG, "Populating Subject UI - started");
+        Log.i(TAG, "Populating LiveData UI - started");
 
+        data.observe(this, value -> {
+            if(null != value) {
+                tvData.setText(String.valueOf(value));
+            }
+        });
 
-        Disposable disposableSubject = subject
-            .subscribe(
-                result -> {
-                    Log.i(TAG, String.format("result: %s", result));
-                    tvData.setText(String.valueOf(result));
-                } ,
-                Throwable::printStackTrace,
-                () -> Log.i(TAG, "Populating Subject UI - finished")
-            );
-
-        disposable.add(disposableSubject);
+        Log.i(TAG, "Populating LiveData UI - finished");
     }
 
     public void addData(View v) {
         currentValue = currentValue + 1;
-        //observable = Observable.just(currentValue);
-        //subject.onNext(currentValue);
-    }
+        data.postValue(currentValue);
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        disposable.dispose();
+        // No need to call the method populateUI again because the "data.observe" checks for updates on the LiveData
     }
 
     @Override

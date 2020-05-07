@@ -9,13 +9,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".LiveDataActivity"
+            android:label="LiveData"></activity>
         <activity
             android:name=".SubjectActivity"
-            android:label="SubjectActivity">
-        </activity>
+            android:label="Subject"></activity>
         <activity
             android:name=".ObservableActivity"
-            android:label="ObservableActivity" >
+            android:label="Observable">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
