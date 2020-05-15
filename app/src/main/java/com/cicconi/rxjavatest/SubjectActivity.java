@@ -23,7 +23,6 @@ public class SubjectActivity extends AppCompatActivity {
     int currentValue = 1;
 
     CompositeDisposable disposable;
-    Observable<Integer> observable;
     ReplaySubject<Integer> subject;
 
     TextView tvData;
@@ -36,10 +35,8 @@ public class SubjectActivity extends AppCompatActivity {
         tvData = findViewById(R.id.tv_data);
 
         disposable = new CompositeDisposable();
-        observable = Observable.just(currentValue);
         subject = ReplaySubject.create();
-
-        observable.subscribe(subject);
+        subject.onNext(currentValue);
 
         populateUI();
     }
@@ -62,9 +59,18 @@ public class SubjectActivity extends AppCompatActivity {
 
     public void addData(View v) {
         currentValue = currentValue + 1;
-        // TODO: I can make the subject subscribes to the values of the observable but how to send more values later?
-        //observable = Observable.just(currentValue);
-        //subject.onNext(currentValue);
+        subject.onNext(currentValue);
+
+        // Advantages:
+        // It works like a LiveData because we just need to add a new data to the stream and the text is
+        // automatically updated (subscribe is done only once)
+
+        // Downsides:
+        // Just like observables, they subscribe on main thread so if this was a heavy task I would need to change it manually
+        // Subjects are not aware of lifecycle events so they don't send data again if the activity is resumed and
+        // also we have to dispose them manually on onDestroy
+
+        // This case is interesting when the data comes from a non observable because we can convert it into an observable
     }
 
     @Override

@@ -56,12 +56,12 @@ public class LiveDataActivity extends AppCompatActivity {
 
         // Advantages:
         // No need to call the method populateUI again because the "data.observe" checks for updates on the LiveData
-        // LiveData is lifecycle aware so only notifies an activity that is active
-        // Also, no need to unsubscribe it because it already knows the state of the activity
+        // LiveData is lifecycle aware so once the activity is resumed it sends the latest data received
+        // Also, no need to unsubscribe it because it already knows when the activity is destroyed
         // LiveData listens to changes already on a background thread so no need to change it
 
         // Downsides:
-        // LiveData alone does not survive configuration changes so it will be reset if the phone is rotated
+        // LiveData alone does not survive configuration changes so it will be reset if the phone is rotated (needs a viewmodel)
         // Not easy to handle errors or transform data before passing to UI
     }
 

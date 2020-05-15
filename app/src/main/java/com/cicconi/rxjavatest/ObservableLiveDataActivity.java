@@ -6,14 +6,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -29,6 +25,7 @@ public class ObservableLiveDataActivity extends AppCompatActivity {
 
     TextView tvData;
 
+    Observable o2;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +57,7 @@ public class ObservableLiveDataActivity extends AppCompatActivity {
 
         Disposable disposableObservable = observable
             .subscribe(
-                result -> data.postValue(result),
+                result -> data.setValue(result),
                 Throwable::printStackTrace,
                 () -> Log.i(TAG, "Populating LiveData UI - finished")
             );
@@ -70,10 +67,23 @@ public class ObservableLiveDataActivity extends AppCompatActivity {
 
     public void addData(View v) {
         currentValue = currentValue + 1;
-        observable = Observable.just(currentValue);
 
-        //TODO: is it possible to make LiveData listens to changes on observable without calling the subscribe again?
+        // useless but proves that it's not possible to update the value of an observable that was already subscribed
+        observable = Observable.just(currentValue);
         updateDataValue();
+
+        // Advantages:
+        // Easy to handle error cases or transforming the data before sending it to the livedata
+
+        // Downsides:
+        // if I want the livedata to be updated when the observable is updated I have to create a new observable and subscribe again
+
+        // By default, observables subscribe on main thread so if this was a heavy task I would need to change it manually
+        // Observables are not aware of lifecycle events so they don't send data again if the activity is resumed and
+        // also we have to dispose them manually on onDestroy
+
+        // ***** This is a useless case in the way I'm handling it here but interesting to understand how to send the
+        // value of an observable to a livedata once
     }
 
     @Override

@@ -52,20 +52,23 @@ public class ObservableActivity extends AppCompatActivity {
 
     public void addData(View v) {
         currentValue = currentValue + 1;
-        observable = Observable.just(currentValue);
 
+        // useless but proves that it's not possible to update the value of an observable that was already subscribed
+        observable = Observable.just(currentValue);
         populateUI();
 
         // Advantages:
         // Easy to handle error cases or transforming the data before sending it to the view
 
         // Downsides:
-        // if I want the view to be updated when the observable is updated I have to do it by myself
-        // calling the method again because the "observable.subscribe" does not keep listening for changes
-        // In other words, I have to subscribe again each time the observable changes
+        // if I want the view to be updated when the observable is updated I have to create a new observable and subscribe again
 
         // By default, observables subscribe on main thread so if this was a heavy task I would need to change it manually
-        // Observables do not survive configuration changes so it will be reset if the phone is rotated
+        // Observables are not aware of lifecycle events so they don't send data again if the activity is resumed and
+        // also we have to dispose them manually on onDestroy
+
+        // This is a useless case as I'm just creating a new observable and subscribing again but it shows that there's
+        // no way to add new data to an observable that was already subscribed
     }
 
     @Override

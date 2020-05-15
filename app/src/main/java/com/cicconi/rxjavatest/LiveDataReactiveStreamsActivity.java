@@ -55,11 +55,23 @@ public class LiveDataReactiveStreamsActivity extends AppCompatActivity {
 
     public void addData(View v) {
         currentValue = currentValue + 1;
+
+        // useless but proves that it's not possible to update the value of an observable that was converted into a livedata
         flowable = Flowable.just(currentValue);
 
-        //TODO: is it possible to add more values to LiveData after LiveDataReactiveStreams.fromPublisher?
-        // Not directly to LiveData but to the flowable that would be used by LiveData (as on a real network call
-        // the data wouldn't be set directly to LiveData)
+        // Advantages:
+        // Easy to handle error cases or transforming the data before sending it to the livedata
+
+        // Downsides:
+        // if I want the livedata to be updated when the observable is updated I have to create a new livedata using
+        // LiveDataReactiveStreams.fromPublisher(flowable) and observe again
+
+        // By default, observables subscribe on main thread so if this was a heavy task I would need to change it manually
+        // Observables are not aware of lifecycle events so they don't send data again if the activity is resumed and
+        // also we have to dispose them manually on onDestroy
+
+        // **** This is a useless case in the way I'm handling it here but interesting to understand how to convert
+        // an observable into a livedata once
     }
 
     @Override
